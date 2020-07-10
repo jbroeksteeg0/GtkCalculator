@@ -1,6 +1,8 @@
 #include <iostream>
 #include <gtk/gtk.h>
 #include <vector>
+#include <iomanip>
+
 #include "eval.h"
 
 using namespace std;
@@ -24,13 +26,13 @@ void buttonEnter(GtkButton *button, gpointer data) {
     string* entered = (string*)data;
     string current = gtk_entry_get_text(GTK_ENTRY(inputEntry));
     gtk_entry_set_text(GTK_ENTRY(inputEntry), (current+*entered).c_str());
-    gtk_label_set_text(GTK_LABEL(answerLabel), (evaluate(current+*entered)).c_str());
+    gtk_label_set_text(GTK_LABEL(answerLabel), ("= " + evaluate(current+*entered)).c_str());
     gtk_widget_show_all(window);
 }
 
 void typeCallback(GtkEditable *widget, gpointer data) {
     string current = gtk_entry_get_text(GTK_ENTRY(inputEntry));
-    gtk_label_set_text(GTK_LABEL(answerLabel), evaluate(current).c_str());
+    gtk_label_set_text(GTK_LABEL(answerLabel), ("= " + evaluate(current)).c_str());
     gtk_widget_show_all(window);
 }
 void buttonClear(GtkButton *button, gpointer data) {
@@ -62,7 +64,8 @@ void onActivate(GtkApplication *app, gpointer data) {
     gtk_container_add(GTK_CONTAINER(window), mainGrid);
 
     inputEntry = gtk_entry_new();
-    answerFrame = gtk_frame_new(NULL);
+    // answerFrame = gtk_frame_new(NULL);
+    answerFrame = gtk_scrolled_window_new(NULL, NULL);
 
     answerLabel = gtk_label_new("=");
     gtk_container_add(GTK_CONTAINER(answerFrame), answerLabel);
@@ -162,6 +165,7 @@ void onActivate(GtkApplication *app, gpointer data) {
 }
 
 int main(int64_t argc, char **argv) {
+
 
     GtkApplication *app = gtk_application_new("org.jbroeksteeg.calculator", G_APPLICATION_FLAGS_NONE);
     g_signal_connect(app, "activate", G_CALLBACK(onActivate), NULL);

@@ -26,7 +26,7 @@ struct Token {
 string tokenEval(list<Token> &currentList) {
     // eval brackets
 
-    float ans = 0;
+    long double ans = 0;
 
     auto iter = currentList.begin();
 
@@ -47,7 +47,7 @@ string tokenEval(list<Token> &currentList) {
     while (iter != currentList.end()) {
         if (iter->type == OPERATOR && iter->value == "-" && (iter == currentList.begin() || prev(iter)->type != NUMBER)) {
             assert(next(iter) != currentList.end() && next(iter)->type == NUMBER);
-            *iter = Token({NUMBER, to_string(stof(next(iter)->value)*-1)});
+            *iter = Token({NUMBER, to_string(stold(next(iter)->value)*-1)});
             currentList.erase(next(iter));
         }
         iter++;
@@ -58,7 +58,7 @@ string tokenEval(list<Token> &currentList) {
     while (iter !=currentList.end()) {
         if (iter->type == OPERATOR && iter->value == "^") {
             if (iter != currentList.begin() && next(iter) != currentList.end() && prev(iter)->type == NUMBER && next(iter)->type == NUMBER) {
-                *iter = Token({NUMBER, to_string( pow(stof(prev(iter)->value), stof(next(iter)->value)) )});
+                *iter = Token({NUMBER, to_string( pow(stold(prev(iter)->value), stold(next(iter)->value)) )});
                 currentList.erase(prev(iter));
                 currentList.erase(next(iter));
             } else {
@@ -76,7 +76,7 @@ string tokenEval(list<Token> &currentList) {
         if (iter->type == OPERATOR && (iter->value == "*" || iter->value == "/" || iter->value == "%")) {
             if (iter != currentList.begin() && next(iter) != currentList.end() && prev(iter)->type == NUMBER && next(iter)->type == NUMBER) {
                 
-                float before = stof(prev(iter)->value), after = stof(next(iter)->value);
+                long double before = stold(prev(iter)->value), after = stold(next(iter)->value);
 
                 if (iter->value == "*") {*iter = Token({NUMBER,to_string(before*after)});}
                 if (iter->value == "/") {
@@ -109,9 +109,9 @@ string tokenEval(list<Token> &currentList) {
     while (iter !=currentList.end()) {
         if (iter->type == OPERATOR && (iter->value == "+" || iter->value == "-")) {
             if (iter != currentList.begin() && next(iter) != currentList.end() && prev(iter)->type == NUMBER && next(iter)->type == NUMBER) {
-                float before = stof(prev(iter)->value);
-                float after = stof(next(iter)->value);
-                float newVal;
+                long double before = stold(prev(iter)->value);
+                long double after = stold(next(iter)->value);
+                long double newVal;
                 if (iter->value == "+") {newVal = before+after;}
                 if (iter->value == "-") {newVal = before-after;}
 
