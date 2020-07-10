@@ -53,6 +53,31 @@ string tokenEval(list<Token> &currentList) {
         iter++;
     }
 
+    // evaluate functions
+    iter = currentList.begin();
+    while (iter != currentList.end()) {
+        if (iter->type == FUNCTION) {
+            if (iter->value == "log2") {
+                if (next(iter) == currentList.end() || next(iter)->type != NUMBER) {
+                    cout << "ERROR: LOG2 ARGUMENTS" << endl;
+                    return "ERROR";
+                }
+                long double after = stold(next(iter)->value);
+                *iter = Token({NUMBER, to_string(log2l(after))});
+                currentList.erase(next(iter));
+            }
+            if (iter->value == "sqrt") {
+                if (next(iter) == currentList.end() || next(iter)->type != NUMBER) {
+                    cout << "ERROR: SQRT ARGUMENTS" << endl;
+                    return "ERROR";
+                }
+                long double after = stold(next(iter)->value);
+                *iter = Token({NUMBER, to_string(sqrtl(after))});
+                currentList.erase(next(iter));
+            }
+        }
+        iter++;
+    }
     // evaluate powers
     iter = currentList.begin();
     while (iter !=currentList.end()) {
@@ -62,7 +87,7 @@ string tokenEval(list<Token> &currentList) {
                 currentList.erase(prev(iter));
                 currentList.erase(next(iter));
             } else {
-                cout << "ERROR: ^ MUST HAVE NUMBER BEFORE AND AFTER" << endl;
+                // cout << "ERROR: ^ MUST HAVE NUMBER BEFORE AND AFTER" << endl;
                 return "ERROR";
             }
         }
@@ -81,14 +106,14 @@ string tokenEval(list<Token> &currentList) {
                 if (iter->value == "*") {*iter = Token({NUMBER,to_string(before*after)});}
                 if (iter->value == "/") {
                     if (after==0.0) {
-                        cout << "ERROR: DIVISION BY ZERO" << endl;
+                        // cout << "ERROR: DIVISION BY ZERO" << endl;
                         return "ERROR";
                     }
                     *iter = Token({NUMBER,to_string(before/after)});
                 }
                 if (iter->value == "%") {
                     if (after==0.0) {
-                        cout << "ERROR: MODULO BY ZERO" << endl;
+                        // cout << "ERROR: MODULO BY ZERO" << endl;
                         return "ERROR";
                     }
                     *iter = Token({NUMBER,to_string(fmod(before,after))});
@@ -97,7 +122,7 @@ string tokenEval(list<Token> &currentList) {
                 currentList.erase(prev(iter));
                 currentList.erase(next(iter));
             } else {
-                cout << "ERROR: " << iter->value << " MUST HAVE NUMBER BEFORE AND AFTER" << endl;
+                // cout << "ERROR: " << iter->value << " MUST HAVE NUMBER BEFORE AND AFTER" << endl;
                 return "ERROR";
             }
         }
@@ -119,7 +144,7 @@ string tokenEval(list<Token> &currentList) {
                 currentList.erase(prev(iter));
                 currentList.erase(next(iter));
             } else {
-                cout << "ERROR: ^ MUST HAVE NUMBER BEFORE AND AFTER" << endl;
+                // cout << "ERROR: " << iter->value << " MUST HAVE NUMBER BEFORE AND AFTER" << endl;
                 return "ERROR";
             }
         }
@@ -200,12 +225,9 @@ string evaluate(string input) {
             current = "";
 
         } else if (isdigit(input[i])) { // in any other case, current should be cleared
-            if (current != "" && !isNumber(current)) {
-                if (isOperator(current)) {
-                    tokens.top()->parts.push_back({OPERATOR, current});
-                } else {
-                    tokens.top()->parts.push_back({FUNCTION, current});
-                }
+            if (current != "" && !isNumber(current) && isOperator(current)) {
+                tokens.top()->parts.push_back({OPERATOR, current});
+                tokens.top()->parts.push_back({FUNCTION, current});
                 current = "";
             }
             current += input[i];

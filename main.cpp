@@ -21,18 +21,42 @@ pair<int64_t,int64_t> getWindowSize() {
     return make_pair(actual->width, actual->height);
 }
 
+const gchar* css = "window {\nfont-size: 30px;\n}";
+
+string addCommas(string input) {
+    if (!isNumber(input)){return input;}
+    int end = input.length();
+    bool flag = false;
+    for (int i = 0; i < input.length(); i++) {
+        if (input[i] == '.') {end = i; flag=true; break;}
+    }
+
+    string ret = (flag ? "." : "");
+    int cnt = 0;
+    for (int i = end+1; i < input.length(); i++) {ret += input[i];}
+
+    for (int i = end-1; i >= 0; i--) {
+        ret = input[i] + ret;
+        if (cnt==2 && i!=0) {
+            ret = "," + ret;
+            cnt=-1;
+        }
+        cnt++;
+    }
+    return ret;
+}
 
 void buttonEnter(GtkButton *button, gpointer data) {
     string* entered = (string*)data;
     string current = gtk_entry_get_text(GTK_ENTRY(inputEntry));
     gtk_entry_set_text(GTK_ENTRY(inputEntry), (current+*entered).c_str());
-    gtk_label_set_text(GTK_LABEL(answerLabel), ("= " + evaluate(current+*entered)).c_str());
+    gtk_label_set_text(GTK_LABEL(answerLabel), ("= " + addCommas(evaluate(current+*entered))).c_str());
     gtk_widget_show_all(window);
 }
 
 void typeCallback(GtkEditable *widget, gpointer data) {
     string current = gtk_entry_get_text(GTK_ENTRY(inputEntry));
-    gtk_label_set_text(GTK_LABEL(answerLabel), ("= " + evaluate(current)).c_str());
+    gtk_label_set_text(GTK_LABEL(answerLabel), ("= " + addCommas(evaluate(current))).c_str());
     gtk_widget_show_all(window);
 }
 void buttonClear(GtkButton *button, gpointer data) {
@@ -56,7 +80,8 @@ void onActivate(GtkApplication *app, gpointer data) {
     gtk_window_set_resizable(GTK_WINDOW(window), FALSE);
 
     prov = gtk_css_provider_new();
-    gtk_css_provider_load_from_path(prov, "./style.css", NULL);
+    // gtk_css_provider_load_from_path(prov, "./style.css", NULL);
+    gtk_css_provider_load_from_data(prov, css, -1, NULL);
     GtkStyleContext *context = gtk_widget_get_style_context(window);
     gtk_style_context_add_provider(context, GTK_STYLE_PROVIDER(prov), GTK_STYLE_PROVIDER_PRIORITY_USER);
 
@@ -165,7 +190,6 @@ void onActivate(GtkApplication *app, gpointer data) {
 }
 
 int main(int64_t argc, char **argv) {
-
 
     GtkApplication *app = gtk_application_new("org.jbroeksteeg.calculator", G_APPLICATION_FLAGS_NONE);
     g_signal_connect(app, "activate", G_CALLBACK(onActivate), NULL);
