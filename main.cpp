@@ -30,7 +30,6 @@ string addCommas(string input) {
     for (int i = 0; i < input.length(); i++) {
         if (input[i] == '.') {end = i; flag=true; break;}
     }
-
     string ret = (flag ? "." : "");
     int cnt = 0;
     for (int i = end+1; i < input.length(); i++) {ret += input[i];}
